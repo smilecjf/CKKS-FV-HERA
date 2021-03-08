@@ -13,7 +13,10 @@ HERAHEADER = Hera.h ShakeAVX2.h
 ENCODERSOURCE = CKKS_Encoder.cpp FV_Encoder.cpp
 ENCODERHEADER = CKKS_Encoder.h FV_Encoder.h
 
-all: hera shake
+all: framework hera shake
+
+framework: framework.cpp $(HERASOURCE) $(HERAHEADER) $(ENCODERSOURCE) $(ENCODERHEADER) $(XKCPHEADER) parms.h
+	$(CXX) $(CXXOPT) framework.cpp $(HERASOURCE) $(ENCODERSOURCE) $(LIBSEAL) $(LIBXKCP) -o framework -mavx2
 
 hera: test_hera.cpp $(HERASOURCE) $(HERAHEADER) parms.h $(XKCPHEADER)
 	$(CXX) $(CXXOPT) test_hera.cpp $(HERASOURCE) $(LIBXKCP) -o test_hera -mavx2
@@ -22,5 +25,6 @@ shake: test_shake_avx2.cpp ShakeAVX2.cpp ShakeAVX2.h parms.h $(XKCPHEADER)
 	$(CXX) $(CXXOPT) test_shake_avx2.cpp ShakeAVX2.cpp $(LIBXKCP) -o test_shake_avx2 -mavx2
 
 clean:
+	rm -f framework
 	rm -f test_hera
 	rm -f test_shake_avx2
