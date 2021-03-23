@@ -1,6 +1,13 @@
 /*
-    Code from https://github.com/microsoft/SEAL.git (version 3.4.5)
-*/
+-----------------------------------------------------------------------
+This source code is excerpted and modified from Microsoft SEAL library
+version 3.4.5.
+
+Copyright (c) Microsoft Corporation. All rights reserved.
+Licensed under the MIT license.
+-----------------------------------------------------------------------
+ */
+
 #include "FV_Encoder.h"
 #include "seal/util/uintarithsmallmod.h"
 

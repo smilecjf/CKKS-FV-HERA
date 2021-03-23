@@ -1,6 +1,8 @@
 #ifndef __SHAKE_AVX2_H__
 #define __SHAKE_AVX2_H__
 
+#include <stdint.h>
+#include <stdlib.h>
 extern "C"
 {
 #include "KeccakP-1600-times4-SnP.h"

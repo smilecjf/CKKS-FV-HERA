@@ -1,6 +1,13 @@
 /*
-    Code from https://github.com/microsoft/SEAL.git (version 3.4.5)
-*/
+-----------------------------------------------------------------------
+This source code is excerpted and modified from Microsoft SEAL library
+version 3.4.5.
+
+Copyright (c) Microsoft Corporation. All rights reserved.
+Licensed under the MIT license.
+-----------------------------------------------------------------------
+ */
+
 #ifndef __FV_ENCODER_H__
 #define __FV_ENCODER_H__
 
@@ -16,7 +23,10 @@ using namespace std;
 class FV_Encoder
 {
 public:
+    // From the constructor of 'BatchEncoder' in 'batchencoder.cpp'
     void init();
+
+    // From 'encode' function in 'batchencoder.cpp'
     vector<uint64_t> encode(vector<uint64_t> data);
     void encode(uint64_t* data, uint64_t* destination);
 
@@ -43,11 +53,11 @@ private:
     uint64_t scaled_inv_root_powers_[poly_modulus_degree_fv];
     uint64_t matrix_reps_index_map_[poly_modulus_degree_fv];
 
-    // FV_Encoder initialization functions
+    // From the functions with the same names in 'batchencoder.cpp'
     void populate_matrix_reps_index_map();
     void populate_roots_of_unity_vector();
 
-    // FV_Encoder utility functions
+    // From the functions with the same names in 'smallntt.cpp'
     void inverse_ntt_negacyclic_harvey_lazy(uint64_t *operand);
     inline void inverse_ntt_negacyclic_harvey(uint64_t *operand);
     void ntt_powers_of_primitive_root(uint64_t root, uint64_t *destination);

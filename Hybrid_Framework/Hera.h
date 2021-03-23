@@ -12,9 +12,21 @@ typedef uint64_t* block_t;
 
 block_t block_init(size_t sz);
 
+
+/*
+Provides functionality of cipher HERA. It takes nonce and counter as
+inputs, and the nonce is assumed not to be reused. This class only
+offers encryption part on the client side of CKKS-FV transciphering
+framework.
+ */
 class Hera
 {
     public:
+        /*
+         Create a HERA instance initialized with secret key
+
+         @param[in] key The secret key
+         */
         Hera(uint64_t *key)
         {
             key_ = block_init(BLOCKSIZE);
@@ -34,6 +46,7 @@ class Hera
             is_shake_init_ = false;
         }
 
+        // Destruct a HERA instance
         ~Hera()
         {
             free(key_);
@@ -44,22 +57,50 @@ class Hera
             }
         }
 
-        // Hera public functions
+        // Re-keying function
         void set_key(uint64_t *key);
+
+        /*
+        Both init and update function compute round keys from
+        extendable output function. The difference is, the init
+        function creates a new ShakeAVX2 object while the update
+        function does not.
+
+        @param[in] nonce Distinct nonce
+        @param[in] counter Counter, but may be used as an integrated nonce
+         */
         void init(uint64_t nonce, uint64_t counter);
         void update(uint64_t nonce, uint64_t counter);
+
+        /*
+        Both crypt and crypt_naive compute a block of HERA. crypt
+        function is an AVX2 implementation while crypt_naive function
+        is a reference code of HERA.
+
+        @param[out] out Keystream of HERA
+         */
         void crypt(block_t out);
         void crypt_naive(block_t out);
+
+        // Copying outputs of XOF
         void get_rand_vectors(uint64_t *output);
+
     private:
-        // Hera private data
+        // Secret key
         block_t key_;
+
+        // Round constants
         block_t rand_vectors_;
+
+        // Key multiplied by round constant
         block_t round_keys_;
+
+        // Shake object
         ShakeAVX2 *shake_;
+
         bool is_shake_init_;
 
-        // Hera private functions
+        // The inner key schedule function in init and update
         void keyschedule();
 };
 

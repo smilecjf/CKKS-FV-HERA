@@ -1,6 +1,15 @@
 /*
-    Code from https://github.com/microsoft/SEAL.git (version 3.4.5)
-*/
+-----------------------------------------------------------------------
+This source code is excerpted and modified from Microsoft SEAL library
+version 3.4.5.
+
+Copyright (c) Microsoft Corporation. All rights reserved.
+Licensed under the MIT license.
+-----------------------------------------------------------------------
+ */
+
+
+
 #ifndef __CKKS_ENCODER_H__
 #define __CKKS_ENCODER_H__
 
@@ -19,7 +28,12 @@ class CKKS_Encoder
 {
 public:
     CKKS_Encoder() {};
+
+    // Initialize the parameters
+    // Newly added function
     void init();
+
+    // From 'encode_internal' function in 'ckks.h'
     void encode(const complex<double> *values, double scale,
         uint64_t *destination, size_t plain_modulus);
 
@@ -37,13 +51,16 @@ private:
     complex<double> inv_roots_[poly_modulus_degree];
     size_t matrix_reps_index_map_[poly_modulus_degree];
 
-    // Initialization functions
+    // From 'get_root' function in 'croots.cpp'
     complex<double> get_root(size_t index);
     inline complex<double> get_root(std::size_t index, std::size_t of_roots);
+
+    // From the constructor of 'CKKSEncoder' in 'ckks.cpp'
     void populate_reps_index_map();
 
-    // Utility functions
     int get_power_of_two(size_t value);
+
+    // From 'reverse_bits' function in 'util/common.h'
     inline uint32_t reverse_bits(uint32_t operand);
     inline size_t reverse_bits(size_t operand);
     inline size_t reverse_bits(size_t operand, int bit_count);

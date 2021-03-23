@@ -1,10 +1,10 @@
 #include <stdlib.h>
 #include <x86intrin.h>
-#include <iostream>
 #include "Hera.h"
 
 #define MONT_REDUCTION (MOD_BIT_COUNT >= 27)
 
+__attribute__((aligned(32))) uint64_t INPUT_CONSTANT[16] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
 constexpr int unpack_order[8] = {2, 3, 6, 7, 0, 1, 4, 5};
 
 block_t block_init(size_t sz)
@@ -48,11 +48,15 @@ void Hera::crypt_naive(block_t out)
 {
     uint64_t buf[BLOCKSIZE];
 
+    for (int i = 0; i < 16; i++)
+        out[i] = i + 1;
+
     for (int r = 0; r < ROUNDS; r++)
     {
         // AddRoundKey
         uint64_t round_key[BLOCKSIZE];
         memcpy(round_key, round_keys_ + r * BLOCKSIZE, sizeof(uint64_t) * BLOCKSIZE);
+
         for (int i = 0; i < BLOCKSIZE; i++)
         {
 #if MONTGOMERY
@@ -152,7 +156,7 @@ void Hera::crypt(block_t out)
     // Montgomery form change
     for (size_t i = 0; i < BLOCKSIZE; i++)
     {
-        out[i] = (out[i] << MONT_MOD_BIT) % MODULUS;
+        out[i] = ((i + 1) << MONT_MOD_BIT) % MODULUS;
     }
 
     __m256i u0, u1, u2, u3, v0, v1, v2, v3, p0, p1, p2, p3, q0, q1, q2, q3;
@@ -619,19 +623,16 @@ void Hera::crypt(block_t out)
     _mm256_store_si256((__m256i *) (out + 4), u1);
     _mm256_store_si256((__m256i *) (out + 8), u2);
     _mm256_store_si256((__m256i *) (out + 12), u3);
+
+
 #else // Not MONTGOMERY
     __m256i u0, u1, u2, u3, v0, v1, v2, v3, p0, p1, p2, p3, q0, q1, q2, q3;
 
-    u0 = _mm256_load_si256((__m256i *) key_);
-    u1 = _mm256_load_si256((__m256i *) (key_ + 4));
-    u2 = _mm256_load_si256((__m256i *) (key_ + 8));
-    u3 = _mm256_load_si256((__m256i *) (key_ + 12));
-
     // Load
-    u0 = _mm256_load_si256((__m256i *) out);
-    u1 = _mm256_load_si256((__m256i *) (out + 4));
-    u2 = _mm256_load_si256((__m256i *) (out + 8));
-    u3 = _mm256_load_si256((__m256i *) (out + 12));
+    u0 = _mm256_load_si256((__m256i *) INPUT_CONSTANT);
+    u1 = _mm256_load_si256((__m256i *) (INPUT_CONSTANT + 4));
+    u2 = _mm256_load_si256((__m256i *) (INPUT_CONSTANT + 8));
+    u3 = _mm256_load_si256((__m256i *) (INPUT_CONSTANT + 12));
 
 
     // Round function
@@ -729,6 +730,12 @@ void Hera::crypt(block_t out)
         u2 = _mm256_permute2x128_si256(v0, v2, 0b00110001);
         u3 = _mm256_permute2x128_si256(v1, v3, 0b00110001);
 
+/*
+Whne using PRIME17, we did not use full reduction which makes element
+always less than t. Instead, we use semi-reduction as follows.
+
+When x = a * 2^32 + b * 2^16 + c, then semi-red(x) = a - b + c + t.
+ */
 #if MODULUS == PRIME17
         p0 = _mm256_set1_epi64x(0x10001);
         p1 = _mm256_set1_epi64x(0xffff);
@@ -1115,6 +1122,11 @@ void Hera::get_rand_vectors(uint64_t *output)
 // Hera private functions
 void Hera::keyschedule()
 {
+    /*
+    Since PRIME17 == 2 ** 16 + 1, random element in Z_t is chosen by
+    sampling 16-bit random string and add 1. Using this method, we
+    can sample uniformly random nonzero sample in Z_t.
+     */
 #if MODULUS == PRIME17
     // Set random vector from SHAKE256
     __attribute__((aligned(32))) uint8_t buf[4 * RATE_IN_BYTE * NUM_SQUEEZE];
@@ -1131,7 +1143,8 @@ void Hera::keyschedule()
     }
 
     // Compute round keys
-    // round_keys[i] := (key_[i] * rand_vectors_[i]) % MODULUS
+    // round_keys[i] = (key_[i] * rand_vectors_[i]) % MODULUS
+
     __m256i u0, u1, u2, u3, v0, v1, v2, v3, p0, p1, w0, w1, w2, w3, w4, w5;
 
     p0 = _mm256_set1_epi64x(0x10001);
@@ -1283,7 +1296,7 @@ void Hera::keyschedule()
     }
 
     // Compute round keys
-    // round_keys[i] := (key_[i] * rand_vectors_[i]) % MODULUS
+    // round_keys[i] = (key_[i] * rand_vectors_[i]) % MODULUS;
     u0 = _mm256_load_si256((__m256i *) key_);
     u1 = _mm256_load_si256((__m256i *) (key_ + 4));
     u2 = _mm256_load_si256((__m256i *) (key_ + 8));

@@ -1,6 +1,14 @@
 /*
-    Code from https://github.com/microsoft/SEAL.git (version 3.4.5)
-*/
+-----------------------------------------------------------------------
+This source code is excerpted and modified from Microsoft SEAL library
+version 3.4.5.
+
+Copyright (c) Microsoft Corporation. All rights reserved.
+Licensed under the MIT license.
+-----------------------------------------------------------------------
+ */
+
+
 #include "CKKS_Encoder.h"
 
 /* CKKS_Encoder Public Functions */
@@ -83,7 +91,7 @@ void CKKS_Encoder::populate_reps_index_map()
     uint64_t m = static_cast<uint64_t>(poly_modulus_degree) << 1;
     for (size_t i = 0; i < slot_count_; i++)
     {
-        // Position in noralm bit order
+        // Position in normal bit order
         uint64_t index1 = (pos - 1) >> 1;
         uint64_t index2 = ( - pos - 1) >> 1;
 

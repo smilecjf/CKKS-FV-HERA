@@ -1,6 +1,7 @@
 #include <iostream>
 #include <iomanip>
 #include <string.h>
+#include <stdio.h>
 #include "ShakeAVX2.h"
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
