@@ -298,12 +298,22 @@ int main()
     time_end = chrono::high_resolution_clock::now();
     time_rks_ecd = chrono::duration_cast<chrono::microseconds>(time_end - time_start);
 
-    // Set zero ciphertexts for evaluation input
+    // Set input constant ic = (1, 2, ..., 16) for evaluation input
     for (int i = 0; i < BLOCKSIZE; i++)
     {
         c[i].resize(context, first_parms_id, 2);
         c[i].is_ntt_form() = false;
         c[i].parms_id() = first_parms_id;
+
+        Plaintext p_ic;
+        vector<uint64_t> data_ic(slot_count);
+        for (size_t j = 0; j < slot_count; j++)
+        {
+            data_ic[j] = i + 1;
+        }
+        batch_encoder.encode(data_ic, p_ic);
+        util::multiply_add_plain_with_scaling_variant(
+            p_ic, *context->get_context_data(first_parms_id), c[i].data());
     }
 
     // Eval
