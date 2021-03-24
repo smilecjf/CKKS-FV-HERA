@@ -66,6 +66,59 @@
     #define MOD_BIT_COUNT 32
     #define MONTGOMERY FALSE
     #define INIT_MOD_DROP 2
+// Par-A
+// 128-bit security, 9-bit precision
+#elif PARM_PRESET == 5
+    #define ROUNDS 5
+    #define MODULUS PRIME17
+    #define MOD_BIT_COUNT 17
+    #define NUM_SQUEEZE 1
+    #define MONTGOMERY FALSE
+    #define MONT_MOD_BIT 32
+    #define MONT_MOD_INV 1
+    #define MONT_PSEUDO_INV 65535
+    #define MONT_ONE 1
+    #define ALL_ONE_MOD_BIT ((1ULL << MONT_MOD_BIT) - 1)
+    #define INIT_MOD_DROP 6
+// Par-B
+// 128-bit security, 13-bit precision
+#elif PARM_PRESET == 6
+    #define ROUNDS 5
+    #define MODULUS PRIME22
+    #define MOD_BIT_COUNT 22
+    #define MONTGOMERY TRUE
+    #define MONT_MOD_BIT 32
+    #define MONT_MOD_INV 3025
+    #define MONT_PSEUDO_INV 3604479
+    #define MONT_ONE 2030425
+    #define ALL_ONE_MOD_BIT ((1ULL << MONT_MOD_BIT) - 1)
+    #define INIT_MOD_DROP 5
+// Par-C
+// 128-bit security, 11-bit precision
+#elif PARM_PRESET == 7
+    #define ROUNDS 5
+    #define MODULUS PRIME22
+    #define MOD_BIT_COUNT 22
+    #define MONTGOMERY TRUE
+    #define MONT_MOD_BIT 32
+    #define MONT_MOD_INV 3025
+    #define MONT_PSEUDO_INV 3604479
+    #define MONT_ONE 2030425
+    #define ALL_ONE_MOD_BIT ((1ULL << MONT_MOD_BIT) - 1)
+    #define INIT_MOD_DROP 5
+// Par-D
+// 128-bit security, 10-bit precision
+#elif PARM_PRESET == 8
+    #define ROUNDS 5
+    #define MODULUS PRIME23
+    #define MOD_BIT_COUNT 23
+    #define MONTGOMERY TRUE
+    #define MONT_MOD_BIT 32
+    #define MONT_MOD_INV 12544
+    #define MONT_PSEUDO_INV 7340031
+    #define MONT_ONE 1047991
+    #define ALL_ONE_MOD_BIT ((1ULL << MONT_MOD_BIT) - 1)
+    #define INIT_MOD_DROP 4
 #endif
 
 #define XOF_ELEMENT_COUNT ((ROUNDS + 1) * BLOCKSIZE)
