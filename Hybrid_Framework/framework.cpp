@@ -407,6 +407,7 @@ int main()
     }
     time_end = chrono::high_resolution_clock::now();
     time_postproc_first = chrono::duration_cast<chrono::microseconds>(time_end - time_start);
+    cout << "  - Ciphertext noise budget: " << decryptor.invariant_noise_budget(c_eval[0]) << " bits" << endl;
 
     time_start = chrono::high_resolution_clock::now();
     for (int l = 1; l < BLOCKSIZE; l++)
@@ -530,6 +531,7 @@ int main()
     evaluator.sub_inplace(c_client[0], c_eval[0]);
     time_end = chrono::high_resolution_clock::now();
     time_he_sub_first = chrono::duration_cast<chrono::microseconds>(time_end - time_start);
+    cout << "  - Ciphertext noise budget: " << decryptor.invariant_noise_budget(c_client[0]) << " bits" << endl;
 
     time_start = chrono::high_resolution_clock::now();
     for (int l = 1; l < BLOCKSIZE; l++)
