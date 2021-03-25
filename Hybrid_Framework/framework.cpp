@@ -39,8 +39,8 @@ inline void print_parameters(std::shared_ptr<seal::SEALContext> context)
     case seal::scheme_type::CKKS:
         scheme_name = "CKKS";
         break;
-    case seal::scheme_type::FV_CKKS:
-        scheme_name = "FV-CKKS";
+    case seal::scheme_type::CKKS_FV:
+        scheme_name = "CKKS-FV";
         break;
     default:
         throw std::invalid_argument("unsupported scheme");
@@ -191,7 +191,7 @@ int main()
     /* Sever-side Computation */
     // Set HE parameter
     sec_level_type sec_level = sec_level_type::tc128;
-    EncryptionParameters parms(scheme_type::FV_CKKS);
+    EncryptionParameters parms(scheme_type::CKKS_FV);
     size_t poly_modulus_degree = POLY_MOD_DEG;
     parms.set_poly_modulus_degree(poly_modulus_degree);
     auto coeff_modulus = CoeffModulus::BFVDefault(poly_modulus_degree, sec_level);
