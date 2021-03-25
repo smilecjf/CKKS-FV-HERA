@@ -19,13 +19,13 @@
 #define PRIME32 4292804609
 
 // Parameter Preset
-#define PARM_PRESET 4
+#define PARM_PRESET 1
 #define BLOCKSIZE 16
-#define POLY_MOD_DEG 32768
 
 // Par-I
 // 80-bit security, 10-bit precision
 #if PARM_PRESET == 1
+    #define POLY_MOD_DEG 32768
     #define ROUNDS 4
     #define MODULUS PRIME28
     #define MOD_BIT_COUNT 28
@@ -38,6 +38,7 @@
 // Par-II
 // 80-bit security, 14-bit precision
 #elif PARM_PRESET == 2
+    #define POLY_MOD_DEG 32768
     #define ROUNDS 4
     #define MODULUS PRIME32
     #define MOD_BIT_COUNT 32
@@ -45,6 +46,7 @@
 // Par-III
 // 128-bit security, 10-bit precision
 #elif PARM_PRESET == 3
+    #define POLY_MOD_DEG 32768
     #define ROUNDS 5
     #define MODULUS PRIME28
     #define MOD_BIT_COUNT 28
@@ -57,6 +59,7 @@
 // Par-IV
 // 128-bit security, 14-bit precision
 #elif PARM_PRESET == 4
+    #define POLY_MOD_DEG 32768
     #define ROUNDS 5
     #define MODULUS PRIME32
     #define MOD_BIT_COUNT 32
@@ -64,6 +67,7 @@
 // Par-A
 // 128-bit security, 9-bit precision
 #elif PARM_PRESET == 5
+    #define POLY_MOD_DEG 16
     #define ROUNDS 5
     #define MODULUS PRIME17
     #define MOD_BIT_COUNT 17
@@ -77,6 +81,7 @@
 // Par-B
 // 128-bit security, 13-bit precision
 #elif PARM_PRESET == 6
+    #define POLY_MOD_DEG 64
     #define ROUNDS 5
     #define MODULUS PRIME22
     #define MOD_BIT_COUNT 22
@@ -89,6 +94,7 @@
 // Par-C
 // 128-bit security, 11-bit precision
 #elif PARM_PRESET == 7
+    #define POLY_MOD_DEG 256
     #define ROUNDS 5
     #define MODULUS PRIME22
     #define MOD_BIT_COUNT 22
@@ -101,6 +107,7 @@
 // Par-D
 // 128-bit security, 10-bit precision
 #elif PARM_PRESET == 8
+    #define POLY_MOD_DEG 1024
     #define ROUNDS 5
     #define MODULUS PRIME23
     #define MOD_BIT_COUNT 23
@@ -109,17 +116,6 @@
     #define MONT_MOD_INV 12544
     #define MONT_PSEUDO_INV 7340031
     #define MONT_ONE 1047991
-    #define ALL_ONE_MOD_BIT ((1ULL << MONT_MOD_BIT) - 1)
-#else // PARM_PRESET == 9
-    #define ROUNDS 4
-    #define MODULUS PRIME17
-    #define MOD_BIT_COUNT 17
-    #define NUM_SQUEEZE 1
-    #define MONTGOMERY FALSE
-    #define MONT_MOD_BIT 32
-    #define MONT_MOD_INV 1
-    #define MONT_PSEUDO_INV 65535
-    #define MONT_ONE 1
     #define ALL_ONE_MOD_BIT ((1ULL << MONT_MOD_BIT) - 1)
 #endif
 
