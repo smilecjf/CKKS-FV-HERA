@@ -220,19 +220,6 @@ namespace seal
         std::shared_ptr<const SEALContext> context);
 
     /**
-    Check whether the given plaintext data is valid for given encryption parameters.
-    If the encryption parameters are invalid, this function returns false. Otherwise,
-    returns true. This function can be slow, as it checks the correctness of the
-    entire plaintext data buffer.
-
-    @param[in] in The plaintext to check
-    @param[in] parms The EncryptionParameters
-    */
-    SEAL_NODISCARD bool is_data_valid_for_bfv(
-        const Plaintext& in,
-        const EncryptionParameters& parms);
-
-    /**
     Check whether the given ciphertext data is valid for a given SEALContext.
     If the given SEALContext is not set, the encryption parameters are invalid,
     or the ciphertext data does not match the SEALContext, this function returns
@@ -349,21 +336,9 @@ namespace seal
         const Ciphertext& in,
         std::shared_ptr<const SEALContext> context)
     {
-        bool metadata = is_metadata_valid_for(in, context);
-        bool buffer = is_buffer_valid(in);
-        bool data = is_data_valid_for(in, context);
-
-        if (!metadata)
-            std::cout << "is_valid_for: invalid meta data" << std::endl;
-        if (!buffer)
-            std::cout << "is_valid_for: invalid buffer data" << std::endl;
-        if (!data)
-            std::cout << "is_valid_for: invalid data" << std::endl;
-
-        return metadata && buffer && data;
-//         return is_metadata_valid_for(in, context) &&
-//             is_buffer_valid(in) &&
-//             is_data_valid_for(in, context);
+        return is_metadata_valid_for(in, context) &&
+            is_buffer_valid(in) &&
+            is_data_valid_for(in, context);
     }
 
     /**

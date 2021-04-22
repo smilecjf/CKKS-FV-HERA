@@ -787,17 +787,6 @@ namespace seal
         }
 
         /**
-        Adds two bfv plaintexts. This function adds plain to current plaintext.
-
-        @param[in] plain The plaintext to add
-
-        @throws std::invalid_argument if current plaintext or plain is not valid
-        for the encryption parameters
-        @throws std::invalid_argument if current plaintext or plain is in NTT form
-        */
-        void add_bfv_inplace(const Plaintext &plain, const EncryptionParameters &parms);
-
-        /**
         Enables access to private members of seal::Plaintext for .NET wrapper.
         */
         struct PlaintextPrivateHelper;

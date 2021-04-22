@@ -1,0 +1,3 @@
+[submodule "lib/SEAL-CKKS-FV"]
+	path = lib/SEAL-CKKS-FV
+	url = https://github.com/smilecjf/SEAL

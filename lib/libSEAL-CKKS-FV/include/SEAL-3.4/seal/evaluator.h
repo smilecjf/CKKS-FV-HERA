@@ -199,18 +199,17 @@ namespace seal
         /**
         Subtracts two ciphertexts. This function computes the difference of encrypted1
         and encrypted2, and stores the result in encrypted1. This function only works
-        on FV_CKKS scheme, and it allow ciphertexts of different scale.
+        on CKKS_FV scheme, and it allow ciphertexts of different scale.
 
-        @param[in] encrypted1 The ciphertext to subtract from
+        @param[in] encrytped1 The ciphertext to subtract from
         @param[in] encrypted2 The ciphertext to subtract
         @throws std::invalid_argument if encrypted1 or encrypted2 is not valid for the
         encryption parameters
-        @throws std::invalid_argument if encrypted1 and encrypted2 are in different
+        @throws std::invalid_argument if encrytped1 or encrypted2 are in different
         NTT forms
-        @throws std::invalid_argument if encrypted1 and encrypted2 have different scale
         @throws std::logic_error if result ciphertext is transparent
         */
-        void sub_fv_ckks_inplace(Ciphertext &encrypted1, const Ciphertext &encrypted2);
+        void sub_ckks_fv_inplace(Ciphertext &encrypted1, const Ciphertext &encrypted2);
 
         /**
         Subtracts two ciphertexts. This function computes the difference of encrypted1
@@ -432,25 +431,6 @@ namespace seal
             MemoryPoolHandle pool = MemoryManager::GetPool())
         {
             mod_switch_to_next(encrypted, encrypted, std::move(pool));
-        }
-
-#ifdef SEAL_THROW_ON_TRANSPARENT_CIPHERTEXT
-        void mod_switch_to_next_transparent(const Ciphertext &encrypted,
-            Ciphertext &destination, MemoryPoolHandle pool = MemoryManager::GetPool());
-
-        inline void mod_switch_to_next_transparent_inplace(Ciphertext &encrypted,
-            MemoryPoolHandle pool = MemoryManager::GetPool())
-        {
-            mod_switch_to_next_transparent(encrypted, encrypted, std::move(pool));
-        }
-#endif
-
-        void mod_drop_to_next_fv(const Ciphertext &encrypted,
-            Ciphertext &destination, MemoryPoolHandle pool = MemoryManager::GetPool());
-        inline void mod_drop_to_next_fv_inplace(Ciphertext &encrypted,
-            MemoryPoolHandle pool = MemoryManager::GetPool())
-        {
-            mod_drop_to_next_fv(encrypted, encrypted, pool);
         }
 
         /**
@@ -994,37 +974,6 @@ namespace seal
         }
 
         /**
-        Transforms a plaintext back from NTT domain. This functions applies the
-        inverse of David Harvey's Number Theoretic Transform separately to the
-        polynomial representing a plaintext.
-
-        @param[in] plaintext_ntt The plaintext to transform
-        @throws std::invalid_argument if plaintext_ntt is not valid for the encryption
-        parameters
-        @throws std::invalid_argument if plaintext_ntt is not in NTT form
-        */
-        void transform_from_ntt_inplace(Plaintext &plaintext_ntt);
-
-        /**
-        Transforms a plaintext back from NTT domain. This functions applies the
-        inverse of David Harvey's Number Theoretic Transform separately to the
-        polynomial representing a ciphertext. The result is stored in the destination
-        parameter.
-
-        @param[in] plaintext_ntt The plaintext to transform
-        @param[out] destination The plaintext to overwrite with the transformed result
-        @throws std::invalid_argument if plaintext_ntt is not valid for the encryption
-        parameters
-        @throws std::invalid_argument if plaintext_ntt is not in NTT form
-        */
-        inline void transform_from_ntt_inplace(const Plaintext &plaintext_ntt,
-            Plaintext &destination)
-        {
-            destination = plaintext_ntt;
-            transform_from_ntt_inplace(destination);
-        }
-
-        /**
         Applies a Galois automorphism to a ciphertext. To evaluate the Galois
         automorphism, an appropriate set of Galois keys must also be provided.
         Dynamic memory allocations in the process are allocated from the memory
@@ -1115,7 +1064,7 @@ namespace seal
         @param[in] steps The number of steps to rotate (negative left, positive right)
         @param[in] galois_keys The Galois keys
         @param[in] pool The MemoryPoolHandle pointing to a valid memory pool
-        @throws std::logic_error if scheme is not scheme_type::BFV
+        @throws std::logic_error if scheme is not scheme_type::BFV or scheme_type::CKKS_FV
         @throws std::logic_error if the encryption parameters do not support batching
         @throws std::invalid_argument if encrypted or galois_keys is not valid for
         the encryption parameters
@@ -1133,8 +1082,8 @@ namespace seal
             int steps, const GaloisKeys &galois_keys,
             MemoryPoolHandle pool = MemoryManager::GetPool())
         {
-            auto context_scheme_type = context_->key_context_data()->parms().scheme();
-            if (context_scheme_type != scheme_type::BFV && context_scheme_type != scheme_type::FV_CKKS)
+            auto scheme = context_->key_context_data()->parms().scheme();
+            if (scheme != scheme_type::BFV && scheme != scheme_type::CKKS_FV)
             {
                 throw std::logic_error("unsupported scheme");
             }
@@ -1156,7 +1105,7 @@ namespace seal
         @param[in] galois_keys The Galois keys
         @param[out] destination The ciphertext to overwrite with the rotated result
         @param[in] pool The MemoryPoolHandle pointing to a valid memory pool
-        @throws std::logic_error if scheme is not scheme_type::BFV
+        @throws std::logic_error if scheme is not scheme_type::BFV or scheme_type::CKKS_FV
         @throws std::logic_error if the encryption parameters do not support batching
         @throws std::invalid_argument if encrypted or galois_keys is not valid for
         the encryption parameters
@@ -1191,7 +1140,7 @@ namespace seal
         @param[in] galois_keys The Galois keys
         @param[out] destination The ciphertext to overwrite with the rotated result
         @param[in] pool The MemoryPoolHandle pointing to a valid memory pool
-        @throws std::logic_error if scheme is not scheme_type::BFV
+        @throws std::logic_error if scheme is not scheme_type::BFV or scheme_type::CKKS_FV
         @throws std::logic_error if the encryption parameters do not support batching
         @throws std::invalid_argument if encrypted or galois_keys is not valid for
         the encryption parameters
@@ -1208,7 +1157,8 @@ namespace seal
             const GaloisKeys &galois_keys,
             MemoryPoolHandle pool = MemoryManager::GetPool())
         {
-            if (context_->key_context_data()->parms().scheme() != scheme_type::BFV)
+            auto scheme = context_->key_context_data()->parms().scheme();
+            if (scheme != scheme_type::BFV && scheme != scheme_type::CKKS_FV)
             {
                 throw std::logic_error("unsupported scheme");
             }
@@ -1228,7 +1178,7 @@ namespace seal
         @param[in] galois_keys The Galois keys
         @param[out] destination The ciphertext to overwrite with the rotated result
         @param[in] pool The MemoryPoolHandle pointing to a valid memory pool
-        @throws std::logic_error if scheme is not scheme_type::BFV
+        @throws std::logic_error if scheme is not scheme_type::BFV or scheme_type::CKKS_FV
         @throws std::logic_error if the encryption parameters do not support batching
         @throws std::invalid_argument if encrypted or galois_keys is not valid for
         the encryption parameters
@@ -1386,51 +1336,30 @@ namespace seal
         }
 
         /**
-        Transforms a ckks plaintext to fv plaintext. The messages encoded in the
-        ckks plaintext should be bounded above by plain modulus of the scheme.
-        The result is stored in the destination parameter.
+        Transforms a FV ciphertext to CKKS ciphertext of the lowest level.
+        Scale of the transformed ciphertext is regarded as its previous scale
+        multiplied with q0/t, which approximates scaling factor in FV scheme.
 
-        @param[in] plain_ckks The ckks plaintext to transform
-        @param[out] destination The plaintext to overwrite with the transformed result
-        @throws std::invalid_argument if plain_ckks is in NTT form
-        @throws std::invalid_argument if plain_ckks is not valid for encryption
-        parameters
-        */
-        void transform_from_ckks_to_fv(const Plaintext &plain_ckks, Plaintext &destination);
-
-        /**
-        Transforms a ckks plaintext to fv plaintext. The messages encoded in the
-        ckks plaintext should be bounded above by plain modulus of the scheme.
-
-        @param[in] plain_ckks The ckks plaintext to transform
-        @throws std::invalid_argument if plain_ckks is in NTT form
-        @throws std::invalid_argument if plain_ckks is not valid for encryption
-        parameters
-        */
-        inline void transform_from_ckks_to_fv_inplace(Plaintext &plain_ckks)
-        {
-            transform_from_ckks_to_fv(plain_ckks, plain_ckks);
-        }
-
-        /**
-        Transforms a fv ciphertext to ckks ciphertext of the lowest level.
-
-        @param[in] encrypted_fv The fv ciphertext to transform
+        @param[in] encrypted_fv The FV ciphertext to transform
         @throws std::invalid_argument if encrypted_fv is not valid for encryption
         parameters
-        @throws std::invalid_argument if encrypted_fv is already in NTT form parameters
+        @throws std::invalid_argument if scheme is not scheme_type::CKKS_FV
+        @throws std::invalid_argument if encrypted_fv is already in NTT form
         */
         void transform_to_lowest_ckks_inplace(Ciphertext &encrypted_fv);
 
         /**
-        Transforms a fv ciphertext to ckks ciphertext of the lowest level.
+        Transforms a FV ciphertext to CKKS ciphertext of the lowest level.
+        Scale of the transformed ciphertext is regarded as its previous scale
+        multiplied with q0/t, which approximates scaling factor in FV scheme.
         The result is stored in the destination parameter.
 
-        @param[in] encrypted_fv The fv ciphertext to transform
+        @param[in] encrypted_fv The FV ciphertext to transform
         @param[out] destination The ciphertext to overwrite with the transformed result
         @throws std::invalid_argument if encrypted_fv is not valid for encryption
         parameters
-        @throws std::invalid_argument if encrypted_fv is already in NTT form parameters
+        @throws std::invalid_argument if scheme is not scheme_type::CKKS_FV
+        @throws std::invalid_argument if encrypted_fv is already in NTT form
         */
         inline void transform_to_lowest_ckks(const Ciphertext &encrypted_fv,
             Ciphertext &destination)
