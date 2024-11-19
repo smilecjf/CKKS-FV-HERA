@@ -1,5 +1,5 @@
 # CKKS-FV-HERA
-This is an implementation of the HERA cipher and its application to the CKKS-FV hybrid transciphering framework proposed in [Hybrid Framework for Approximate Computation over Encrypted Data](https://eprint.iacr.org/2020/1335).
+This is an implementation of the HERA cipher and its application to the CKKS-FV hybrid transciphering framework proposed in [Hybrid Framework for Approximate Computation over Encrypted Data]([https://eprint.iacr.org/2020/1335](https://eprint.iacr.org/archive/2020/1335/20210304:021449)).
 
 ## Client-side
 [HERA](./HERA) contains a client-side implementation of the hybrid framework:
